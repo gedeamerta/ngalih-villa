@@ -47,6 +47,13 @@ COPY --from=frontend-build /app/public/build /app/public/build
 
 COPY . .
 
+RUN mkdir -p \
+    storage/framework/cache/data \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache
+
 RUN php artisan storage:link || true
 
 ENV APP_ENV=production
