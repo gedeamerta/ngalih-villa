@@ -51,5 +51,7 @@ RUN php artisan storage:link || true
 
 ENV APP_ENV=production
 ENV APP_DEBUG=false
+ENV LOG_CHANNEL=stderr
+ENV LOG_LEVEL=debug
 
-CMD php artisan package:discover --ansi || true && php artisan migrate --force || true && php artisan storage:link || true && php -S 0.0.0.0:${PORT:-8000} -t public
+CMD php artisan package:discover --ansi && php artisan migrate --force && (php artisan storage:link || true) && php -S 0.0.0.0:${PORT:-8000} -t public
