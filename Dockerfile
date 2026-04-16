@@ -4,9 +4,15 @@ RUN apk add --no-cache \
     curl \
     git \
     unzip \
+    $PHPIZE_DEPS \
     icu-dev \
+    oniguruma-dev \
     libzip-dev \
-    && docker-php-ext-install intl zip
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install intl zip mbstring pdo_mysql gd
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
@@ -25,11 +31,16 @@ FROM php:8.4-cli-alpine
 WORKDIR /app
 
 RUN apk add --no-cache \
+    $PHPIZE_DEPS \
     icu-dev \
     libzip-dev \
     oniguruma-dev \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
     sqlite-libs \
-    && docker-php-ext-install intl zip pdo_mysql
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install intl zip mbstring pdo_mysql gd
 
 COPY --from=vendor-build /app/vendor /app/vendor
 COPY --from=frontend-build /app/public/build /app/public/build
