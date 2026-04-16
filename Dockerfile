@@ -1,12 +1,3 @@
-FROM node:20-alpine AS frontend-build
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
-COPY resources ./resources
-COPY public ./public
-COPY vite.config.js postcss.config.js tailwind.config.js ./
-RUN npm run build
-
 FROM php:8.4-cli-alpine AS vendor-build
 WORKDIR /app
 RUN apk add --no-cache \
@@ -19,6 +10,16 @@ RUN apk add --no-cache \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
+FROM node:20-alpine AS frontend-build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY resources ./resources
+COPY public ./public
+COPY vite.config.js postcss.config.js tailwind.config.js ./
+COPY --from=vendor-build /app/vendor/tightenco/ziggy /app/vendor/tightenco/ziggy
+RUN npm run build
 
 FROM php:8.4-cli-alpine
 WORKDIR /app
