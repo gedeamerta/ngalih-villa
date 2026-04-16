@@ -7,8 +7,16 @@ COPY public ./public
 COPY vite.config.js postcss.config.js tailwind.config.js ./
 RUN npm run build
 
-FROM composer:2 AS vendor-build
+FROM php:8.4-cli-alpine AS vendor-build
 WORKDIR /app
+RUN apk add --no-cache \
+    curl \
+    git \
+    unzip \
+    icu-dev \
+    libzip-dev \
+    && docker-php-ext-install intl zip
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
@@ -33,4 +41,3 @@ ENV APP_ENV=production
 ENV APP_DEBUG=false
 
 CMD php artisan migrate --force || true && php artisan storage:link || true && php -S 0.0.0.0:${PORT:-8000} -t public
-
