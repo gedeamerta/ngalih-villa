@@ -15,7 +15,7 @@ RUN apk add --no-cache \
     && docker-php-ext-install intl zip mbstring pdo_mysql gd
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
+RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-scripts
 
 FROM node:20-alpine AS frontend-build
 WORKDIR /app
@@ -52,4 +52,4 @@ RUN php artisan storage:link || true
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
-CMD php artisan migrate --force || true && php artisan storage:link || true && php -S 0.0.0.0:${PORT:-8000} -t public
+CMD php artisan package:discover --ansi || true && php artisan migrate --force || true && php artisan storage:link || true && php -S 0.0.0.0:${PORT:-8000} -t public
