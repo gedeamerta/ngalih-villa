@@ -5,6 +5,7 @@ import { VueDatePicker } from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { format, differenceInDays } from 'date-fns';
 import intlTelInput from 'intl-tel-input';
+import intlTelInputWithUtils from 'intl-tel-input/intlTelInputWithUtils';
 import 'intl-tel-input/dist/css/intlTelInput.css';
 
 const props = defineProps({
@@ -21,7 +22,7 @@ let iti = null;
 
 onMounted(() => {
     if (phoneInput.value) {
-        iti = intlTelInput(phoneInput.value, {
+        iti = intlTelInputWithUtils(phoneInput.value, {
             initialCountry: "auto",
             geoIpLookup: (callback) => {
                 fetch("https://ipapi.co/json")
@@ -29,7 +30,6 @@ onMounted(() => {
                     .then((data) => callback(data.country_code))
                     .catch(() => callback("id"));
             },
-            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
         });
     }
 });
